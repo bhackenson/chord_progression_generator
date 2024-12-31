@@ -162,36 +162,46 @@
         for (let chord of data_chords) { chords.push(chord.notes) }
         const melody = data_melody;
 
+        const playbtn = document.getElementById("playbtn");
+
         if (time_sig == "4/4") {
             Tone.getTransport().bpm.value = tempo;
             Tone.getTransport().timeSignature = [4, 4];
             const part = new Tone.Part(((time, chord) => {
+                Tone.getTransport().scheduleOnce(() => {
                 for (let note of chord) { unhighlightKey(note_to_id[note.slice(0, -1)] + note.charAt(note.length - 1)); }
+                }, "+16n");
                 sampler.triggerAttackRelease(chord, "4n", time);
                 for (let note of chord) { highlightKey(note_to_id[note.slice(0, -1)] + note.charAt(note.length - 1)); }
             }),[[0,     chords[0].concat(melody[0][0])],
-                ["0:0:2", melody[0][1]],
-                ["0:1:0", melody[0][2]],
-                ["0:1:2", melody[0][3]],
+                ["0:0:2", [melody[0][1]]],
+                ["0:1:0", [melody[0][2]]],
+                ["0:1:2", [melody[0][3]]],
                 ["0:2", chords[1].concat(melody[1][0])],
-                ["0:2:2", melody[1][1]],
-                ["0:3:0", melody[0][2]],
-                ["0:3:2", melody[0][3]],
+                ["0:2:2", [melody[1][1]]],
+                ["0:3:0", [melody[0][2]]],
+                ["0:3:2", [melody[0][3]]],
                 ["1:0", chords[2].concat(melody[2][0])],
-                ["1:0:2", melody[2][1]],
-                ["1:1:0", melody[2][2]],
-                ["1:1:2", melody[2][2]],
+                ["1:0:2", [melody[2][1]]],
+                ["1:1:0", [melody[2][2]]],
+                ["1:1:2", [melody[2][3]]],
                 ["1:2", chords[3].concat(melody[3][0])],
-                ["1:2:2", melody[3][1]],
-                ["1:3:0", melody[3][2]],
-                ["1:3:2", melody[3][3]]])
+                ["1:2:2", [melody[3][1]]],
+                ["1:3:0", [melody[3][2]]],
+                ["1:3:2", [melody[3][3]]]])
             .start(0);
 
             Tone.getTransport().scheduleOnce(() => {
                 part.stop();
                 part.dispose();
                 Tone.getTransport().stop();
+                if (playbtn) playbtn.disabled = false;
+                for (let key in activeKeys) { activeKeys[key] = false; }
             }, '2m');
+
+            Tone.getTransport().scheduleOnce(() => {
+                if (playbtn) playbtn.disabled = true;   
+            }, 0);
 
             Tone.getTransport().start();
             return;
@@ -201,38 +211,35 @@
             Tone.getTransport().bpm.value = tempo;
             Tone.getTransport().timeSignature = [3, 4];
             const part = new Tone.Part(((time, chord) => {
-                /*
                 Tone.getTransport().scheduleOnce(() => {
-                for (let note of chord) {
-                    // unhighlightKey(note_to_id[note.slice(0, -1)] + note.charAt(note.length - 1));
-                }
+                for (let note of chord) { unhighlightKey(note_to_id[note.slice(0, -1)] + note.charAt(note.length - 1)); }
                 }, "+4n");
-                */
                 sampler.triggerAttackRelease(chord, "4n", time);
-                /*
-                for (let note of chord) { 
-                    // highlightKey(note_to_id[note.slice(0, -1)] + note.charAt(note.length - 1));
-                }
-                */
+                for (let note of chord) { console.log("highlighted: " + note); highlightKey(note_to_id[note.slice(0, -1)] + note.charAt(note.length - 1)); }
             }),[[0,     chords[0].concat(melody[0][0])],
-                ["0:1:0", melody[0][1]],
-                ["0:2:0", melody[0][2]],
+                ["0:1:0", [melody[0][1]]],
+                ["0:2:0", [melody[0][2]]],
                 ["1:0:0", chords[1].concat(melody[1][0])],
-                ["1:1:0", melody[1][1]],
-                ["1:2:0", melody[0][2]],
+                ["1:1:0", [melody[1][1]]],
+                ["1:2:0", [melody[0][2]]],
                 ["2:0:0", chords[2].concat(melody[2][0])],
-                ["2:1:0", melody[2][1]],
-                ["2:2:0", melody[2][2]],
+                ["2:1:0", [melody[2][1]]],
+                ["2:2:0", [melody[2][2]]],
                 ["3:0:0", chords[3].concat(melody[3][0])],
-                ["3:1:0", melody[3][1]],
-                ["3:2:0", melody[3][2]]])
+                ["3:1:0", [melody[3][1]]],
+                ["3:2:0", [melody[3][2]]]])
             .start(0);
 
             Tone.getTransport().scheduleOnce(() => {
                 part.stop();
                 part.dispose();
                 Tone.getTransport().stop();
+                if (playbtn) playbtn.disabled = false;
             }, '4m');
+
+            Tone.getTransport().scheduleOnce(() => {
+                if (playbtn) playbtn.disabled = true;   
+            }, 0);
 
             Tone.getTransport().start();
             return;
@@ -613,6 +620,7 @@
 
     .play-btn:disabled, .export-btn:disabled {
       cursor: not-allowed;
+      opacity: 50%;
       transition: none;
     }
 
