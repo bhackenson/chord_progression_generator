@@ -129,7 +129,9 @@ def show_melody_notes(chord, time_sign):
 def show_chord_name(chord):
     flat_symbol = '\u266D'
     sharp_symbol = '\u266F'
-    return {"chord": f'{str(chord.root().name).replace("-", flat_symbol).replace("#", sharp_symbol)} {chord.commonName}', "notes": [str(chord.root().name).replace("-", "b") + '3'] + [str(p).replace("-", "b") + '4' for p in chord.pitches]}
+    # return {"chord": f'{str(chord.root().name).replace("-", flat_symbol).replace("#", sharp_symbol)} {chord.commonName}', "notes": [str(chord.root().name).replace("-", "b") + '3'] + [str(p).replace("-", "b") + '4' for p in chord.pitches]}
+    return {"chord": f'{str(chord.root().name).replace("-", flat_symbol).replace("#", sharp_symbol)} {chord.commonName}', "notes": [str(p).replace("-", "b") + '3' for p in chord.pitches]}
+
 
 # creating a midi file 
 def create_midi_file(chords, melody, key_sig, time_sig='4/4', m_tempo=120, path="output.mid"):
@@ -173,6 +175,9 @@ def create_midi_file(chords, melody, key_sig, time_sig='4/4', m_tempo=120, path=
         rn.duration = c.duration
         part.append(rn)
         """
+
+    mel.clef = clef.TrebleClef()
+    part.clef = clef.BassClef()
 
     part.timeSignature = meter.TimeSignature(time_sig)
 

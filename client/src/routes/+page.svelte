@@ -213,7 +213,7 @@
             const part = new Tone.Part(((time, chord) => {
                 Tone.getTransport().scheduleOnce(() => {
                 for (let note of chord) { unhighlightKey(note_to_id[note.slice(0, -1)] + note.charAt(note.length - 1)); }
-                }, "+4n");
+                }, "+8n");
                 sampler.triggerAttackRelease(chord, "4n", time);
                 for (let note of chord) { console.log("highlighted: " + note); highlightKey(note_to_id[note.slice(0, -1)] + note.charAt(note.length - 1)); }
             }),[[0,     chords[0].concat(melody[0][0])],
@@ -475,12 +475,12 @@
                 </div>
             </div>
         <div class="time-sigs">
-            <p>Time signature:</p>
+            <p><b>Time signature:</b></p>
             <input type='button' id="4/4" class="time-sig" value="4/4" on:click={() => selectTime("4/4")} name="4/4">
             <input type='button' id="3/4" class="time-sig" value="3/4" on:click={() => selectTime("3/4")} name="3/4">
             <input type='button' id="6/8" class="time-sig" value="6/8" on:click={() => selectTime("6/8")} name="6/8">
             <div>&emsp;</div>
-            <p>Tempo:</p>
+            <p><b>Tempo:</b></p>
             <div class="tempo-btn">
                 <input type="number" min="24" max="200" class="input" bind:value={tempo} name="tempo" placeholder="Enter tempo">
             </div>
@@ -596,7 +596,6 @@
 
     .play-btn, .export-btn {
         border: none;
-        font-size: medium;
         color: black;
         background-color: lightblue;
         border-radius: 10px;
@@ -604,7 +603,7 @@
         padding-bottom: 15px;
         padding-left: 20px;
         padding-right: 20px;
-        font-size: large;
+        font-size: x-large;
         transition: background-color 0.3s;
     }
 
@@ -629,10 +628,10 @@
         display: grid;
         justify-content: center;
         align-items: center;
-        /*height: 97vh;
-        width: 98vw; */
-        height: 850px;
-        width: 1475px;
+        /*height: 98vh;
+        width: 98vw;*/
+        height: 855px;
+        width: 1485px;
   }
     .input {
       border-style: solid;
@@ -647,9 +646,11 @@
   }
 
     .create-progression {
-        border: solid;
+        border: 1px solid #2c2c2c;
         position: absolute;
         top: 0;
+        height: 606px;
+        width: 844px;
         align-content: center;
         justify-content: center;
         align-items: center;
@@ -690,12 +691,12 @@
     }
 
     #sheetmusic {
-        border: solid;
+      border: 1px solid #2c2c2c;
       position: absolute;
       top: 0;
-      width: 620px;
+      width: 638px;
       left: 845px;
-      height: 605px;
+      height: 606px;
       display: block;
       /* flex-direction: column; */
       justify-content: center;
@@ -876,8 +877,11 @@
     .piano {
         display: flex;
         position: absolute;
-        bottom: 0;
+        top: 607px;
         left: 0;
+        height: 248px;
+        /* width: 1485px; */
+        width: 100%;
     }
 
     .white-key {
@@ -886,10 +890,17 @@
         border-bottom-right-radius: 5%;
         margin-left: 2px;
         margin-right: 2px;
-        width: 50px;
-        height: 225px;
+        width: 51px;
+        height: 247px;
         background-color: #fff;
         z-index: 1;
+    }
+    #C2 {
+        margin-left: 0;
+    }
+
+    #B5 {
+        margin-right: 0;
     }
 
     .white-key:hover {
@@ -902,7 +913,7 @@
 
     .black-key {
       width: 25px;
-      height: 135px;
+      height: 150px;
       background: linear-gradient(to bottom, #2c2c2c 67% , rgb(124, 124, 124) 100%);
       border-bottom-left-radius: 8%;
       border-bottom-right-radius: 8%;

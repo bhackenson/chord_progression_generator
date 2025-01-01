@@ -1,5 +1,4 @@
 <script>
-    import { onMount } from "svelte";
     import Store from "./Store.js";
     import { NoteSubGroup, Vex } from "vexflow";
 
@@ -55,7 +54,7 @@
             const staveBass2 = new Vex.Flow.Stave(350, 150, 220);
 
             staveTreble1.addClef('treble').addTimeSignature('4/4').addKeySignature(keySig);
-            staveBass1.addClef('treble').addTimeSignature('4/4').addKeySignature(keySig);
+            staveBass1.addClef('bass').addTimeSignature('4/4').addKeySignature(keySig);
 
             staveTreble1.setContext(vf.getContext()).draw();
             staveTreble2.setContext(vf.getContext()).draw();
@@ -63,7 +62,7 @@
             staveBass2.setContext(vf.getContext()).draw();
 
             let _chords = []; for (let c of chords) { _chords.push(c.notes); }
-            _chords = _chords.map(notes => new Vex.Flow.StaveNote({keys: notes.map(n => insertSlash(n)), duration: 'h'}));
+            _chords = _chords.map(notes => new Vex.Flow.StaveNote({keys: notes.map(n => insertSlash(n)), duration: 'h', clef: 'bass'}));
             // let mel1 = data.melody.map(notes => new Vex.Flow.Tuplet(notes.map(n => new Vex.Flow.StaveNote({keys: [insertSlash(n)], duration: "8"}))));
             let mel1 = data.melody.reduce((acc,e) => acc.concat(e), []).map(n => new Vex.Flow.StaveNote({keys: [insertSlash(n)], duration: "8"}));
 
@@ -193,7 +192,7 @@
             const staveBass4 = new Vex.Flow.Stave(460, 150, 110);
 
             staveTreble1.addClef('treble').addTimeSignature('3/4').addKeySignature(keySig);
-            staveBass1.addClef('treble').addTimeSignature('3/4').addKeySignature(keySig);
+            staveBass1.addClef('bass').addTimeSignature('3/4').addKeySignature(keySig);
 
             staveTreble1.setContext(vf.getContext()).draw();
             staveTreble2.setContext(vf.getContext()).draw();
@@ -205,7 +204,7 @@
             staveBass4.setContext(vf.getContext()).draw();
 
             let _chords = []; for (let c of chords) { _chords.push(c.notes); }
-            _chords = _chords.map(notes => new Vex.Flow.StaveNote({keys: notes.map(n => insertSlash(n)), duration: 'h', dots: 1}));
+            _chords = _chords.map(notes => new Vex.Flow.StaveNote({keys: notes.map(n => insertSlash(n)), duration: 'h', dots: 1, clef: 'bass'}));
             // let mel1 = data.melody.map(notes => new Vex.Flow.Tuplet(notes.map(n => new Vex.Flow.StaveNote({keys: [insertSlash(n)], duration: "8"}))));
             let mel1 = data.melody.reduce((acc,e) => acc.concat(e), []).map(n => new Vex.Flow.StaveNote({keys: [insertSlash(n)], duration: "q"}));
 
@@ -307,7 +306,7 @@
             const staveBass2 = new Vex.Flow.Stave(350, 150, 220);
 
             staveTreble1.addClef('treble').addTimeSignature('6/8').addKeySignature(keySig);
-            staveBass1.addClef('treble').addTimeSignature('6/8').addKeySignature(keySig);
+            staveBass1.addClef('bass').addTimeSignature('6/8').addKeySignature(keySig);
 
             staveTreble1.setContext(vf.getContext()).draw();
             staveTreble2.setContext(vf.getContext()).draw();
@@ -315,7 +314,7 @@
             staveBass2.setContext(vf.getContext()).draw();
 
             let _chords = []; for (let c of chords) { _chords.push(c.notes); }
-            _chords = _chords.map(notes => new Vex.Flow.StaveNote({keys: notes.map(n => insertSlash(n)), duration: 'q', dots: 1}));
+            _chords = _chords.map(notes => new Vex.Flow.StaveNote({keys: notes.map(n => insertSlash(n)), duration: 'q', dots: 1, clef: 'bass'}));
             // let mel1 = data.melody.map(notes => new Vex.Flow.Tuplet(notes.map(n => new Vex.Flow.StaveNote({keys: [insertSlash(n)], duration: "8"}))));
             let mel1 = data.melody.reduce((acc,e) => acc.concat(e), []).map(n => new Vex.Flow.StaveNote({keys: [insertSlash(n)], duration: "8"}));
 
@@ -354,12 +353,6 @@
     }
 
     $: data, renderSheetMusic();
-
-    /*
-    onMount(() => {
-        renderSheetMusic();
-    });
-    */
 
 </script>
 <div bind:this={container}></div>
