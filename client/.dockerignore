@@ -1,0 +1,10 @@
+node_modules/
+package-lock.json
+/.svelte-kit
+.vite
+build
+*.log
+.DS_Store
+.git
+.gitignore
+.vscode

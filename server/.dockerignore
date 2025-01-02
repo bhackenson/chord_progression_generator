@@ -1,0 +1,12 @@
+*.pyc
+*.pyo
+__pycache__
+.venv
+.env/
+.env
+*.log
+.git
+.gitignore
+.vscode
+docker-compose.override.yml
+output.mid

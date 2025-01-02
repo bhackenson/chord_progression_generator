@@ -259,7 +259,7 @@
       if (exportbtn) exportbtn.disabled = true;
 
       try {
-        const response = await fetch('http://localhost:5000/api/get_progression', {
+        const response = await fetch(`/api/get_progression`, {
               method: 'POST',
               headers: {
                   'Content-Type': 'application/json'
@@ -410,7 +410,7 @@
     }
 
     async function createMidiFile() {
-        const response = await fetch('http://localhost:5000/api/send_midi', {
+        const response = await fetch(`/api/send_midi`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -655,15 +655,7 @@
         justify-content: center;
         align-items: center;
     }
-    #title {
-        font-family: sans-serif;
-        color: #0F3A57;
-    }
 
-    .sig-title {
-        color: #0F3A57;
-        font-size: large;
-    }
     .time-sigs {
         display: flex;
         margin-top: 1rem;
@@ -704,11 +696,6 @@
       /* max-height: 500px; */
       overflow: hidden;
       transition: max-height 0.5s ease;
-      opacity: 1;
-    }
-
-    #sheetmusic.visible {
-      max-height: 350px;
       opacity: 1;
     }
 
@@ -880,8 +867,8 @@
         top: 607px;
         left: 0;
         height: 248px;
-        /* width: 1485px; */
-        width: 100%;
+        width: 1485px;
+        /* width: 100%; */
     }
 
     .white-key {
@@ -951,37 +938,6 @@
 
     .white-key + .white-key {
        margin-left: -1px;
-    }
-
-    .row {
-      display: flex;
-    }
-
-    .listen {
-      border-color: lightblue;
-      border-style: solid;
-      display: block;
-      font-size: small;
-      margin-top: 110px;
-      margin-bottom: 150px;
-      color: black;
-      background-color: white;
-      border-radius: 5px;
-      transition: background-color 0.3s;
-    }
-
-    .listen:not(:disabled):hover {
-        cursor: pointer;
-        background-color: #f4f4f4;
-    }
-
-    .listen:not(:disabled):active {
-      cursor: pointer;
-      background-color: #e4e4e4;
-    }
-
-    .listen:disabled {
-      cursor: not-allowed;
     }
 
     .chordnames {
