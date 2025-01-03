@@ -111,20 +111,6 @@
         StoreSampler.subscribe((s) => { sampler = s; });
         StoreSampler.update(s => { return s; });
     });
-/*
-    let sampler = new Tone.Sampler({
-            urls: {
-                "C2": "C2.m4a",
-                "C3": "C3.m4a",
-                "C4": "C4.m4a",
-                "E4": "E4.m4a",
-                "G4": "G4.m4a",
-                "C5": "C5.m4a"
-            },
-            baseUrl: "/audio/",
-            release: 1
-        }).toDestination();
-        */
 
     async function activateAudioContext() {
         await Tone.start();
@@ -259,7 +245,7 @@
       if (exportbtn) exportbtn.disabled = true;
 
       try {
-        const response = await fetch(`/api/get_progression`, {
+        const response = await fetch(`/chord-progression-generator-serv/api/get_progression`, {
               method: 'POST',
               headers: {
                   'Content-Type': 'application/json'
@@ -410,7 +396,7 @@
     }
 
     async function createMidiFile() {
-        const response = await fetch(`/api/send_midi`, {
+        const response = await fetch(`/chord-progression-generator-serv/api/send_midi`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

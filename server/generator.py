@@ -1,24 +1,11 @@
 import numpy as np
-import tensorflow as tf
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import LSTM, Dense, Dropout
-from music21 import *
+from tensorflow.keras.layers import LSTM, Dense
+from music21 import chord, note, key, interval, roman, stream, duration, clef, meter, midi, tempo
 import pandas as pd
-import matplotlib.pyplot as plt
 import re
 import random
 
-# plot for training and validation loss
-def plot_hist(hist, output='hist.png'):
-    plt.plot(hist.history['loss'], label='Training Loss')
-    plt.plot(hist.history['val_loss'], label='Validation Loss')
-    plt.legend()
-    plt.xlabel('Epochs')
-    plt.ylabel('Loss')
-    plt.title('Training and Validation Loss')
-    plt.savefig(output)
-
-# chord to vector creation
 def chord_to_vector(chord):
     note_to_index = {
         'C': 0, 'B#': 0,
@@ -46,7 +33,6 @@ def chord_to_vector(chord):
 
     return ret
 
-# pitch to vector creation
 def pitch_to_vector(pitch):
     note_to_index = {
         'C': 0, 'B#': 0,
@@ -73,7 +59,6 @@ def pitch_to_vector(pitch):
 
     return ret
 
-# reversing vector to chord creation
 def vector_to_chord(vector):
     pitch_classes = []
 
@@ -85,7 +70,6 @@ def vector_to_chord(vector):
     return c
 
 # original key is C major or C minor
-# transposing the chord
 def transpose_chord(original_chord, m, target_key_name):
     if (m != 'major' and m != 'minor'):
         raise Exception("input string m is not equal to 'major' or 'minor'.")
@@ -98,11 +82,9 @@ def transpose_chord(original_chord, m, target_key_name):
     
     return transposed_chord
 
-# get roman numeral info
 def show_roman_numeral(chord, key_sig):
     return roman.romanNumeralFromChord(chord, key.Key(key_sig))
     
-# chord to melody creation
 def chord_to_melody(chord):
     melody = [p for p in chord.pitches]
     if ((len(chord.pitches)) < 4):
@@ -110,7 +92,6 @@ def chord_to_melody(chord):
         melody += extra_notes
     return melody
 
-# get melody info
 def show_melody_notes(chord, time_sign):
     if time_sign == "4/4":
         melody = [p.replace("-", "b") + '4' for p in chord.pitchNames]
@@ -125,15 +106,12 @@ def show_melody_notes(chord, time_sign):
             melody += extra_notes
         return melody[:-1]
         
-# get chord
 def show_chord_name(chord):
     flat_symbol = '\u266D'
     sharp_symbol = '\u266F'
     # return {"chord": f'{str(chord.root().name).replace("-", flat_symbol).replace("#", sharp_symbol)} {chord.commonName}', "notes": [str(chord.root().name).replace("-", "b") + '3'] + [str(p).replace("-", "b") + '4' for p in chord.pitches]}
     return {"chord": f'{str(chord.root().name).replace("-", flat_symbol).replace("#", sharp_symbol)} {chord.commonName}', "notes": [str(p).replace("-", "b") + '3' for p in chord.pitches]}
 
-
-# creating a midi file 
 def create_midi_file(chords, melody, key_sig, time_sig='4/4', m_tempo=120, path="output.mid"):
     score = stream.Score()
     mel = stream.Part()
@@ -193,7 +171,6 @@ def create_midi_file(chords, melody, key_sig, time_sig='4/4', m_tempo=120, path=
     mf.close()
     return
 
-# creating a midi file from a progression
 def create_midi_from_progression(chords, melody, key_sig, time_sig='4/4', m_tempo=120, path="output.mid"):
     score = stream.Score()
     part = stream.Part()
@@ -253,7 +230,6 @@ def create_midi_from_progression(chords, melody, key_sig, time_sig='4/4', m_temp
     mf.close()
     return
 
-# get roman numeral info
 def get_roman_numerals():
     # C major (no vii-dim)
     I = np.array([1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0]) # Cmaj
@@ -287,7 +263,6 @@ def get_roman_numerals():
         "VII": VII
     }
 
-# building the model
 def build_model(m):
     if (m != 'major' and m != 'minor'):
         raise Exception("input string m is not equal to 'major' or 'minor'.")
@@ -325,7 +300,6 @@ def build_model(m):
     model = Sequential()
     model.add(LSTM(128, input_shape=(3, 12), return_sequences=True))
     model.add(Dense(12, activation='sigmoid'))
-    # model.add(Dropout(0.2))
 
     # Compile the model
     model.compile(loss='binary_crossentropy', optimizer='adam')
@@ -336,7 +310,6 @@ def build_model(m):
 def apply_threshold(predictions, threshold=0.5):
     return (predictions > threshold).astype(int)
 
-# Generating a new chord progression
 def generate_chord_progression(model, seed_chord, length):
     chord_progression = [seed_chord]
     current_chord = seed_chord
@@ -360,7 +333,6 @@ def generate_chord_progression(model, seed_chord, length):
 
     return np.array(chord_progression), chord_strings
 
-# randomize seed chord
 def randomize_seed(m):
     if (m == 'major'):
         major_numerals = list(get_roman_numerals().items())[:6]
@@ -379,7 +351,6 @@ def randomize_seed(m):
 # flattened_list = [item for sublist in new_progression for item in sublist]
 # print(flattened_list)
 # print(chord_strings)
-# plot_hist(history)
 # print([transpose_chord(c, tone, 'B-m') for c in chord_strings])
 # print([[pitch_to_vector(p) for p in chord_to_mel(t)] for t in [transpose_chord(c, tone, 'B-m') for c in chord_strings]])
 # print([show_melody_notes(t) for t in [transpose_chord(c, tone, "Am") for c in chord_strings]])

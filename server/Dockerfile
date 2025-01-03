@@ -2,7 +2,7 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
-RUN pip install numpy flask flask-cors tensorflow matplotlib pandas music21 gunicorn
+RUN pip install numpy flask flask-cors tensorflow pandas music21 gunicorn
 
 COPY ./ ./
 
