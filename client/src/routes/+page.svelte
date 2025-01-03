@@ -245,7 +245,7 @@
       if (exportbtn) exportbtn.disabled = true;
 
       try {
-        const response = await fetch(`http://chord-progression-generator-serv:5000/api/get_progression`, {
+        const response = await fetch(`/api/get_progression`, {
               method: 'POST',
               headers: {
                   'Content-Type': 'application/json'
@@ -396,7 +396,7 @@
     }
 
     async function createMidiFile() {
-        const response = await fetch(`http://chord-progression-generator-serv:5000/api/send_midi`, {
+        const response = await fetch(`/api/send_midi`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
