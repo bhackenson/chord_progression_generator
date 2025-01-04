@@ -1,4 +1,5 @@
 import numpy as np
+from tensorflow import keras
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense
 from music21 import chord, note, key, interval, roman, stream, duration, clef, meter, midi, tempo
@@ -74,7 +75,7 @@ def transpose_chord(original_chord, m, target_key_name):
     if (m != 'major' and m != 'minor'):
         raise Exception("input string m is not equal to 'major' or 'minor'.")
     # key names (strings): 'CM' = C major; 'Cm' = C minor; 'F#M' = F# major; 'B-m' = Bb minor; etc
-    original_key = key.Key('CM') if m == 'major' else key.Key('Cm')
+    original_key = key.Key('CM') if m == 'major' else key.Key('Am')
     target_key = key.Key(target_key_name)
 
     transposition_interval = interval.Interval(original_key.tonic, target_key.tonic)
@@ -83,7 +84,7 @@ def transpose_chord(original_chord, m, target_key_name):
     return transposed_chord
 
 def show_roman_numeral(chord, key_sig):
-    return roman.romanNumeralFromChord(chord, key.Key(key_sig))
+    return roman.romanNumeralFromChord(chord, key.Key(key_sig)).romanNumeralAlone
     
 def chord_to_melody(chord):
     melody = [p for p in chord.pitches]
@@ -93,18 +94,7 @@ def chord_to_melody(chord):
     return melody
 
 def show_melody_notes(chord, time_sign):
-    if time_sign == "4/4":
-        melody = [p.replace("-", "b") + '4' for p in chord.pitchNames]
-        if ((len(chord.pitches)) < 4):
-            extra_notes = [j.name.replace("-", "b") + '4' for j in [p.transpose(12) for p in chord.pitches[:(4-(len(chord.pitches)))]]] # pad melody so each chord has a 4-note melody (arpeggio)
-            melody += extra_notes
-        return melody
-    if time_sign == "3/4" or time_sign == "6/8":
-        melody = [p.replace("-", "b") + '4' for p in chord.pitchNames]
-        if ((len(chord.pitches)) < 4):
-            extra_notes = [j.name.replace("-", "b") + '4' for j in [p.transpose(12) for p in chord.pitches[:(4-(len(chord.pitches)))]]] # pad melody so each chord has a 4-note melody (arpeggio)
-            melody += extra_notes
-        return melody[:-1]
+    return [chord.pitchNames[i % len(chord.pitchNames)].replace("-", "b") + '4' for i in range(4 if time_sign == '4/4' else 3)]
         
 def show_chord_name(chord):
     flat_symbol = '\u266D'
@@ -238,13 +228,13 @@ def get_roman_numerals():
     IV = np.array([1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0]) #Fmaj
     V = np.array([0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1]) #Gmaj
     vi = np.array([1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0]) #Amin
-    # C minor (no ii-dim)
-    i = np.array([1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0]) # Cmin
-    III = np.array([0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0]) # Ebmaj
-    iv = np.array([1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0]) # Fmin
-    v = np.array([0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0]) # Gmin
-    VI = np.array([1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0]) # Abmaj
-    VII = np.array([0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0]) # Bbmaj
+    # A minor (no ii-dim)
+    i = np.array([1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0]) # Amin
+    III = np.array([1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0]) # Cmaj
+    iv = np.array([0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0]) # Dmin
+    v = np.array([0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1]) # Emin
+    VI = np.array([1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0]) # Fmaj
+    VII = np.array([0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1]) # Gmaj
     return {
         # major
         "I": I,
@@ -263,18 +253,17 @@ def get_roman_numerals():
         "VII": VII
     }
 
-def build_model(m):
-    if (m != 'major' and m != 'minor'):
-        raise Exception("input string m is not equal to 'major' or 'minor'.")
+def build_model():
     df = pd.read_csv("dataset.csv") # pop chord progressions from https://github.com/ology/Data-Dataset-ChordProgressions/blob/master/share/Chord-Progressions.csv?plain=1
     matrix = df.values
     progressions = []
     for entry in matrix:
-        if (entry[1] == m):
-            p = re.split('[-]', entry[4])
-            progressions.append([get_roman_numerals()[i] for i in p])
+        p = re.split('[-]', entry[4])
+        progressions.append([get_roman_numerals()[i] for i in p])
 
-    prog_train, prog_test = np.split(progressions, [54], axis=0)
+    np.random.shuffle(progressions)
+
+    prog_train, prog_test = np.split(progressions, [130], axis=0)
 
     X = []
     y = []
@@ -296,6 +285,9 @@ def build_model(m):
     X_t = np.array(X_t)
     y_t = np.array(y_t)
 
+    print("X_t shape:", X_t.shape)  # Expected: (num_sequences, 3, 12)
+    print("y_t shape:", y_t.shape)  # Expected: (num_sequences, 3, 12)
+
     # Define the model
     model = Sequential()
     model.add(LSTM(128, input_shape=(3, 12), return_sequences=True))
@@ -303,9 +295,14 @@ def build_model(m):
 
     # Compile the model
     model.compile(loss='binary_crossentropy', optimizer='adam')
-    history = model.fit(X, y, epochs=150, validation_data=(X_t, y_t), batch_size=32)
+    model.fit(X, y, epochs=150, validation_data=(X_t, y_t), batch_size=32)
 
-    return model, m, history
+    model.save("progression_model.h5")
+    print("model saved")
+    loaded_model = keras.models.load_model("progression_model.h5")
+    print("Model loaded sucessfully")
+
+    loaded_model.summary()
 
 def apply_threshold(predictions, threshold=0.5):
     return (predictions > threshold).astype(int)
@@ -345,8 +342,8 @@ def randomize_seed(m):
     else:
         raise Exception("input string m is not equal to 'major' or 'minor'.")
 
-# generate progression, plot history, create MIDI file
-# model, tone, history = build_model('minor')
+# generate progression, create MIDI file
+# model = keras.models.load_model("progression_model.h5")
 # new_progression, chord_strings = generate_chord_progression(model, randomize_seed(tone), 4)
 # flattened_list = [item for sublist in new_progression for item in sublist]
 # print(flattened_list)

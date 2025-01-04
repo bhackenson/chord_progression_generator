@@ -6,7 +6,6 @@
     import * as Tone from 'tone';
 
     let currClicked = null;
-    let mode = "";
     let currTimeSig = null;
     let tempo = 100;
     let sampler = null;
@@ -101,10 +100,10 @@
             release: 1
         }).toDestination();
 
-        Store.set({"key_signature": "", "mode": "", "time_signature": "", "tempo": 0, "chords": [], "melody": []});
+        Store.set({"key_signature": "", "time_signature": "", "tempo": 0, "chords": [], "roman_numerals": [], "melody": []});
         Store.subscribe(progobj => { progression = progobj; });
         Store.subscribe(progobj => {
-            chordnames = progobj.chords.map(chord_obj => chord_obj.chord);
+            chordnames = progobj.chords.map((chord_obj, i) => ({chord: chord_obj.chord, roman_numeral: progobj.roman_numerals[i]}));
         })
 
         StoreSampler.set(sampler1);
@@ -250,7 +249,8 @@
               headers: {
                   'Content-Type': 'application/json'
               },
-              body: JSON.stringify({"key_signature": currClicked.id, "mode": mode, "time_signature": currTimeSig.id, "tempo": tempo})
+              mode: 'cors',
+              body: JSON.stringify({"key_signature": currClicked.id, "time_signature": currTimeSig.id, "tempo": tempo})
           });
         const data = await response.json();
         Store.update((progobj) => {
@@ -289,14 +289,10 @@
             let d = document.getElementById("genbtn");
             if (currClicked) { d.disabled = false; }
             else { d.disabled = true; }
-      //TODO
         }
     }
 
     async function selectKey(id) {
-        if (id.toUpperCase() !== id) { mode = "minor" }
-        else { mode = "major"; }
-
         var div = document.getElementById(id);
 
         if (currClicked && currClicked !== div) {
@@ -478,10 +474,12 @@
     </div>
     <div id="sheetmusic" class:loading={progLoading}>
       <div class="chordnames">
-        {#each chordnames as c}
-            <p class="chordname"><b>{c}</b></p>
-        {/each}
-    </div>
+            {#each chordnames as c}
+            <div class="chordname-container">
+                <p class="chordname"><b>{c.chord}</b><br>{c.roman_numeral}</p>
+            </div>
+            {/each}
+      </div>
       <div id="prog" class='progression'>
         <p id="prog-hidden" hidden={firstProgression}><i>No current progression</i></p>
         <SheetMusic/>
@@ -933,7 +931,6 @@
       align-items: center;
       white-space: normal;
     }
-
     .chordname {
         justify-content: center;
         align-items: center;
