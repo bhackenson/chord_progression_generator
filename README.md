@@ -8,3 +8,5 @@ The frontend application displays sheet music of a generated chord progression p
 
 Dependencies include [Tensorflow](https://pypi.org/project/tensorflow/) for the model, [music21](https://pypi.org/project/music21/) for computational musical analysis,
 [Tone.js](https://github.com/Tonejs/Tone.js) for frontend audio context, and [Vexflow](https://github.com/0xfe/vexflow) for sheet music rendering.
+
+The web application for this project can be found [here](https://chord-progression-generator-ysg3n.ondigitalocean.app/).
